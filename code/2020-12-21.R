@@ -5,6 +5,7 @@ library(forcats)
 library(lubridate)
 library(tibbletime)
 
+
 # Either ISO-8601 date or year/week works!
 
 
@@ -86,41 +87,12 @@ rollingDiff <- rollify(.f = diff, window = 2)
 normalit<-function(m){
   (m - mean(m))/(sd(m))
 }
-
-
-cur <- bigMac %>% 
-  filter(name %in% top10_2020_overValued$name) %>% 
-  mutate(overValued = dollar_price - adj_price) %>% 
-  #rolling b/w between the overvalued column by 2 years 
-  group_by(name) %>% 
-  mutate(roll.diff =lag(rollingDiff(overValued)),
-         currencyFlucs = normalit(dollar_ex)) %>% 
-  select(name, date, roll.diff, currencyFlucs) %>% 
-  ggplot(aes(date, currencyFlucs)) +
-  geom_line(group=1)+
-  facet_grid(~name) +
-  theme(axis.text.x = element_text(angle = 45, hjust=1)) 
-
-rolDif <- bigMac %>% 
-  filter(name %in% top10_2020_overValued$name) %>% 
-  mutate(overValued = dollar_price - adj_price) %>% 
-  #rolling b/w between the overvalued column by 2 years 
-  group_by(name) %>% 
-  mutate(roll.diff =lag(rollingDiff(overValued)),
-         currencyFlucs = scale(dollar_ex)) %>% 
-  select(name, date, roll.diff, roll.diff) %>% 
-  ggplot(aes(date, roll.diff)) +
-  geom_line(group=1)+
-  facet_grid(~name) +
-  theme(axis.text.x = element_text(angle = 45, hjust=1)) 
-
-cur
-
+ 
 
 library(patchwork)
 
 
-rolDif / cur
+
 
 
 
@@ -231,27 +203,19 @@ cur_Sw <- bigMac %>%
   theme(panel.background =element_rect(fill = "yellow", colour = "grey50"))
 
 
-p1 <- rolDif_Sw / cur_Sw 
-
-
-p2 <- rolDif_NZ / cur_NZ
-
-p3 <- rolDif_B / cur_B
 
 
 
-(p1 + plot_spacer() | p2) / (plot_spacer() + p3 + plot_spacer())
 
-install.packages("ggtext")
-library(ggtext)
+# (p1 + plot_spacer() | p2) / (plot_spacer() + p3 + plot_spacer())
 
-ggplot() + geom_text() +
-  annotate(label = "plot mpg vs. wt")
+
+
   
+#can't figure out how to add text in these plot-spacer things
 
-
-patchwork <- (((rolDif_Sw / cur_Sw ) | plot_spacer()  | (rolDif_NZ / cur_NZ)) /
-  (plot_spacer() + (rolDif_B / cur_B) + plot_spacer())) 
+# patchwork <- (((rolDif_Sw / cur_Sw ) | plot_spacer()  | (rolDif_NZ / cur_NZ)) /
+#   (plot_spacer() + (rolDif_B / cur_B) + plot_spacer())) 
 
 
 
